@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Quoted price
+{% endblock %}
+
+<!-- This time I won't be doing a form because I am just showing the quoted price for stock-->
+{% block main %}
+<div action="/quoted" method="get">
+    <h1 class="" name="company">Company Name: {{ company }}</h1>
+    <h2 class="" name="symbol">Stock Symbol: {{ symbol }}</h2>
+    <!-- doing "| usd" allows for the usd function to apply to the variable price attaching a dollar sign-->
+    <h3 class="" name="price">Current Price: {{ price | usd}}</h3>
+
+</div>
+
+{% endblock %}
