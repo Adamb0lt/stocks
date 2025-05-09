@@ -22,6 +22,13 @@ A full-stack stock trading web application built as part of [CS50x](https://cs50
 - Jinja templating
 - Bootstrap (for styling)
 
+## 📁 Project Structure
+- app.py # Main Flask application containing routes and app logic
+- helpers.py # Utility functions: apology messages, login decorators, API lookup, USD formatting
+- templates/ # Jinja2 HTML templates (e.g., layout.html, quote.html, register.html)
+- static/ # Static assets like custom CSS or JavaScript files (optional)
+- finance.db # SQLite database file storing user info, transactions, and user portfolio data
+- README.md # This file (project overview, instructions, structure, & next steps)
 ## 📍 Current Status
 
 I am actively building out the core functionality of the app. The `quote` and `buy` routes are fully functional, including user balance checks and transaction logging. Table creation and database updates are handled cleanly. Frontend elements are being iteratively styled and improved.
