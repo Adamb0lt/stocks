@@ -5,15 +5,31 @@
 {% endblock %}
 
 {% block main %}
-<table>
-<tr>
-    <th> Stock </th>
-    <th> Shares owned </th>
-    <th> Current price per stock </th>
-    <th> Total Value of Holding </th>
-    <th> Current Cash Balance </th>
+<table class="table">
+        <thead>
+            <tr>
+                <th>Company</th>
+                <th>Symbol</th>
+                <th>Shares</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stock in portfolio %}
+                <tr>
+                    <td>{{ stock.name }}</td>
+                    <td>{{ stock.symbol }}</td>
+                    <td>{{ stock.shares }}</td>
+                    <td>{{ stock.price }}</td>
+                    <td>{{ stock.total }}</td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="4"><strong>Cash</strong></td>
+                <td><strong>{{ cash }}</strong></td>
+            </tr>
+        </tbody>
+    </table>
 
-</tr>
-</table>
-
-{% endblock}
+{% endblock %}

@@ -35,11 +35,36 @@ def after_request(response):
 @app.route("/")
 @login_required
 def index():
-    if request.method == "GET":
-        
+    user_id = session["user_id"]
 
-    """Show portfolio of stocks"""
-    return apology("TODO")
+    # Get user cash
+    user_info = db.execute("SELECT * FROM users WHERE id = ?", user_id)
+    cash = user_info[0]["cash"]
+
+    # Get user's transactions
+    transactions = db.execute("SELECT * FROM transactions WHERE user_id = ?", user_id)
+
+    # List to store portfolio entries
+    portfolio = []
+
+    # Go through each unique stock the user has
+    for row in transactions:
+        symbol = row["symbol"]
+        shares = row["shares"]
+        stock_info = lookup(symbol)
+        name = stock_info["name"]
+        price = stock_info["price"]
+        total = price * shares
+
+        portfolio.append({
+            "name": name,
+            "symbol": symbol,
+            "shares": shares,
+            "price": usd(price),
+            "total": usd(total)
+        })
+
+    return render_template("index.html", portfolio=portfolio, cash=usd(cash))
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -247,7 +272,7 @@ def register():
         hash_password = generate_password_hash(password)
 
         # insert into db the hash password and username
-        db.execute("INSERT INTO USERS (username, hash) VALUES (?, ?)", username.lower(), hash_password)
+        db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", username.lower(), hash_password)
 
         # once done, send them back to login page to login
         return redirect("/login")
