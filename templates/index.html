@@ -13,6 +13,7 @@
                 <th>Shares</th>
                 <th>Price</th>
                 <th>Total</th>
+                <th>Running Total</th>
             </tr>
         </thead>
         <tbody>
@@ -23,6 +24,7 @@
                     <td>{{ stock.shares }}</td>
                     <td>{{ stock.price }}</td>
                     <td>{{ stock.total }}</td>
+                    <td>{{ stock.running_total }}</td>
                 </tr>
             {% endfor %}
             <tr>

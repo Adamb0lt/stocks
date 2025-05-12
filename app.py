@@ -47,21 +47,28 @@ def index():
     # List to store portfolio entries
     portfolio = []
 
+    # keep track of total stock price overall
+    running_total = 0
+
+    # TODO: Build out logic to differentiate totals for different companies
+    # TODO: Update cash balance
     # Go through each unique stock the user has
     for row in transactions:
         symbol = row["symbol"]
         shares = row["shares"]
         stock_info = lookup(symbol)
         name = stock_info["name"]
-        price = stock_info["price"]
+        price = float(row["price"])
         total = price * shares
+        running_total += total
 
         portfolio.append({
             "name": name,
             "symbol": symbol,
             "shares": shares,
             "price": usd(price),
-            "total": usd(total)
+            "total": usd(total),
+            "running_total": usd(running_total)
         })
 
     return render_template("index.html", portfolio=portfolio, cash=usd(cash))

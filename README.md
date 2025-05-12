@@ -41,6 +41,12 @@ I am actively building out the core functionality of the app. The `quote` and `b
 - [ ] Improve error messaging and form feedback  
 - [ ] Finalize README and clean up code for public release
 
+### ⚙️ Prerequisites
+
+- Python 3 installed  
+- Flask and CS50 library installed  
+- Internet connection (for stock price lookups)
+
 ## 📎 Repository Link
 
 [https://github.com/Adamb0lt/CS50-Finance-App](https://github.com/Adamb0lt/CS50-Finance-App)
