@@ -71,13 +71,24 @@ def usd(value):
 
 def init_db():
     db = SQL("sqlite:///finance.db")
+
+    db.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            hash TEXT NOT NULL,
+            cash NUMERIC NOT NULL DEFAULT 10000.00
+        );
+    """)
+
     db.execute("""
         CREATE TABLE IF NOT EXISTS transactions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             symbol TEXT NOT NULL,
             shares INTEGER NOT NULL,
-            price NUMERIC NOT NULL,
+            stock_price NUMERIC NOT NULL,
+            total_price NUMERIC NOT NULL,
             type TEXT NOT NULL CHECK (type IN ('buy', 'sell')),
             cash_balance NUMERIC NOT NULL,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,

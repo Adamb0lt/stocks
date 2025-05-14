@@ -47,30 +47,42 @@ def index():
     # List to store portfolio entries
     portfolio = []
 
-    # keep track of total stock price overall
-    running_total = 0
+    # Get list of unique stocks user owns
+    rows = db.execute("""
+        SELECT symbol, SUM(shares) AS total_shares
+        FROM transactions
+        WHERE user_id = ?
+        GROUP BY symbol
+        HAVING total_shares > 0
+    """, user_id)
 
-    # TODO: Build out logic to differentiate totals for different companies
-    # TODO: Update cash balance
-    # Go through each unique stock the user has
-    for row in transactions:
+    for row in rows:
         symbol = row["symbol"]
-        shares = row["shares"]
-        stock_info = lookup(symbol)
-        name = stock_info["name"]
-        price = float(row["price"])
-        total = price * shares
-        running_total += total
+        shares = row["total_shares"]
+        stock = lookup(symbol)
+        current_price = stock["price"]
+        current_value = current_price * shares
+
+        # Get total spent on this stock (buy transactions only)
+        spending = db.execute("""
+            SELECT SUM(stock_price * shares) AS total_spent
+            FROM transactions
+            WHERE user_id = ? AND symbol = ? AND type = 'buy'
+        """, user_id, symbol)
+
+        # total user spent and also what their gain or loss is
+        total_spent = spending[0]["total_spent"]
+        gain_loss = current_value - total_spent
 
         portfolio.append({
-            "name": name,
             "symbol": symbol,
+            "name": stock["name"],
             "shares": shares,
-            "price": usd(price),
-            "total": usd(total),
-            "running_total": usd(running_total)
+            "price": usd(current_price),
+            "total": usd(current_value),
+            "gain_loss": usd(gain_loss)
         })
-
+    
     return render_template("index.html", portfolio=portfolio, cash=usd(cash))
 
 
@@ -106,6 +118,7 @@ def buy():
 
         # store info on user that can be used later on to access variables to place in another table
         user_info = db.execute("SELECT * FROM users WHERE id = ?", user_id)
+        stock_price = float(stock["price"])
         total_price = shares * float(stock["price"])
 
         if total_price > user_info[0]["cash"]:
@@ -122,9 +135,9 @@ def buy():
 
             # add users within table( I could technically have them added every time a new account is successfully created)
             db.execute("""
-                INSERT INTO transactions (user_id, symbol, shares, price, type, cash_balance)
-                VALUES (?, ?, ?, ?, 'buy', ?)
-            """, user_id, symbol, shares, total_price, user_info[0]["cash"] - total_price)
+                INSERT INTO transactions (user_id, symbol, shares, stock_price, total_price, type, cash_balance)
+                VALUES (?, ?, ?, ?, ?, 'buy', ?)
+            """, user_id, symbol, shares, stock_price, total_price, user_info[0]["cash"] - total_price)
 
             # Update user total cash balance from user's after they buy or sell stock
             db.execute("""
@@ -153,8 +166,50 @@ def buy():
 @app.route("/history")
 @login_required
 def history():
+    user_id = session["user_id"]
+
+    # Get user cash
+    user_info = db.execute("SELECT * FROM users WHERE id = ?", user_id)
+    cash = user_info[0]["cash"]
+
+    # Get user's transactions
+    transactions = db.execute("SELECT * FROM transactions WHERE user_id = ?", user_id)
+
+    # List to store portfolio entries
+    portfolio = []
+
+    # keep track of total stock price overall
+    running_total = 0
+
+    # TODO: Build out logic to differentiate totals for different companies
+    # TODO: Update cash balance
+    # Go through each unique stock the user has
+    for row in transactions:
+            
+        symbol = row["symbol"]
+        shares = row["shares"]
+        stock_info = lookup(symbol)
+        name = stock_info["name"]
+        purchase_price = float(row["price"])
+        current_price = stock_info["price"]
+        total_value = purchase_price * shares
+        running_total += total_value
+
+        portfolio.append({
+            "name": name,
+            "symbol": symbol,
+            "shares": shares,
+            "purchase price": usd(purchase_price),
+            "current_price": usd(current_price),
+            "total_value": usd(total_value),
+            "running_total": usd(running_total)
+        })
+
+    return render_template("index.html", portfolio=portfolio, cash=usd(cash))
+    '''
     """Show history of transactions"""
     return apology("TODO")
+    '''
 
 
 @app.route("/login", methods=["GET", "POST"])

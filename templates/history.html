@@ -11,9 +11,10 @@
                 <th>Company</th>
                 <th>Symbol</th>
                 <th>Shares</th>
+                <th>Purchase Price</th>
                 <th>Current Price</th>
-                <th>Total</th>
-                <th>Gain/Loss</th>
+                <th>Total Value</th>
+                <th>Running Total</th>
             </tr>
         </thead>
         <tbody>
@@ -22,9 +23,10 @@
                     <td>{{ stock.name }}</td>
                     <td>{{ stock.symbol }}</td>
                     <td>{{ stock.shares }}</td>
-                    <td>{{ stock.price }}</td>
-                    <td>{{ stock.total }}</td>
-                    <td>{{ stock.gain_loss }}</td>
+                    <td>{{ stock.purchase_price }}</td>
+                    <td>{{ stock.current_price }}</td>
+                    <td>{{ stock.total_value }}</td>
+                    <td>{{ stock.running_total }}</td>
                 </tr>
             {% endfor %}
             <tr>
