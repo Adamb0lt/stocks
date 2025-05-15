@@ -357,6 +357,27 @@ def sell():
         stock = lookup(symbol)
         if not stock or not symbol:
             return apology("Invalid or missing stock symbol", 400)
+        
+        # find all stocks user owns through ownership table
+        # TODO: I also need to add functionality to update shares of stocks from buys and sells
+        # TODO: Also need functionality to delete a stock if it is the last share that is sold
+        current = db.execute("""SELECT * FROM ownership
+                             WHERE user_id = ?
+                             and stock = ?
+                             """, session["user_id"], symbol)
+        # TODO: check over if this still gives a list that is probs empty
+        if not current:
+            return apology("You do not own this stock", 400)
+        
+        # if a user tries to sell more stocks than they own
+        if shares > current[0]["shares"]:
+            return apology("You are trying to sell more stocks than you own")
+        
+        
+
+        #
+        
+
         # for fun, dont really need try except
 
 

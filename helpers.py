@@ -95,3 +95,14 @@ def init_db():
             FOREIGN KEY(user_id) REFERENCES users(id)
         );
     """)
+
+    db.execute("""
+        CREATE TABLE IF NOT EXISTS ownership(
+               user_id INTEGER NOT NULL,
+               company TEXT NOT NULL,
+               stock TEXT NOT NULL,
+               shares INTEGER NOT NULL,
+               PRIMARY KEY (user_id, stock),
+               FOREIGN KEY(user_id) REFERENCES users(id)
+               );
+               """)

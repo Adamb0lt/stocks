@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Buy
+{% endblock %}
+
+{% block main %}
+<form method="post" action="/buy">
+    <div class="mb-3">
+        <select type="text" autofocus autocomplete="off" class="form-control mx-auto w-auto" name="symbol" Placeholder="Stock">
+        <select>
+            <!-- Place in the name of options as part of Jinja loop -->
+            <option>{{ }}</option>
+
+        </select>
+    </div>
+    <div class="mb-3">
+        <input type="text" autofocus autocomplete="off" class="form-control mx-auto w-auto" name="shares" placeholder="Number of shares">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Buy!</button>
+</form>
+
+{% endblock %}
