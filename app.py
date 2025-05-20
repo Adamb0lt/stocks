@@ -348,15 +348,30 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock"""
+    # has to be defined outside so it can be accessed by if == post and also by get method
+    stock_list = db.execute("SELECT stock FROM ownership WHERE user_id = ?", session["user_id"])
+    # authenticate that symbol is legit
+
+    # remake stock_list into a neater list given its a list with dictionaries in it
+    stock_listing = [row["stock"] for row in stock_list] 
+    print(stock_listing)
+
     if request.method == "POST":
         # get the symbol that the user submits
         symbol = request.form.get("symbol")
         shares = request.form.get("shares")
+        
 
-        # authenticate that symbol is legit
+
+        # also check that stock exists
         stock = lookup(symbol)
-        if not stock or not symbol:
-            return apology("Invalid or missing stock symbol", 400)
+
+        # multiple tests to validate stock based on variables created
+        if not stock or not symbol or symbol not in stock_listing:
+            return apology("Invalid stock or missing stock symbol", 400)
+        
+        
+
         
         # find all stocks user owns through ownership table
         # TODO: I also need to add functionality to update shares of stocks from buys and sells
@@ -365,77 +380,30 @@ def sell():
                              WHERE user_id = ?
                              and stock = ?
                              """, session["user_id"], symbol)
+        
+        
+            
+
+
         # TODO: check over if this still gives a list that is probs empty
         if not current:
             return apology("You do not own this stock", 400)
         
         # if a user tries to sell more stocks than they own
-        if shares > current[0]["shares"]:
-            return apology("You are trying to sell more stocks than you own")
-        
-        
-
-        #
-        
-
-        # for fun, dont really need try except
-
-
         try:
-            shares = float(shares)
-            if shares <= 0:
-                return apology("Number of shares isn't positive integer", 400)
+            shares = int(shares)
+            if shares > current[0]["shares"]:
+                return apology("You cannot sell more shares than you own", 400)
+            if shares < 0:
+                return apology("Shares must be a positive integer")            
         except (ValueError, TypeError):
-            return apology("You didn't enter a number for the shares", 400)
+            return apology("Shares must be a positive integer", 400)
+        
+        
 
-
-
-        # perform SQL check to access how much cash the user has
-        # this is the same as trying to get request.form.get("username") from the login page
-        # session["user_id"] is global so not affected by scope
-        user_id = session["user_id"]
-
-        # store info on user that can be used later on to access variables to place in another table
-        user_info = db.execute("SELECT * FROM users WHERE id = ?", user_id)
-        total_price = shares * float(stock["price"])
-
-        if total_price > user_info[0]["cash"]:
-            return apology("You don't have enough funds", 400)
-        # I added in the three quotes so that the multi-line string is read for db statement
-        # Create the table if it doesn't exist, if it does, add user date in
-        # probably will need rules or store info in variables and then add in table
-
-        # Try for a transaction that is found in other forms of SQL
-        try:
-
-            # start transaction
-            db.execute("BEGIN")
-
-            # add users within table( I could technically have them added every time a new account is successfully created)
-            db.execute("""
-                INSERT INTO transactions (user_id, symbol, shares, price, type, cash_balance)
-                VALUES (?, ?, ?, ?, 'buy', ?)
-            """, user_id, symbol, shares, total_price, user_info[0]["cash"] - total_price)
-
-            # Update user total cash balance from user's after they buy or sell stock
-            db.execute("""
-                UPDATE users
-                SET cash = cash - ?
-                WHERE id = ?
-            """, total_price, user_id)
-
-            db.execute("COMMIT")
-
-        except Exception as e:
-            db.execute("ROLLBACK")
-            return apology("Transaction failed", 400)
-
-
-        # go back to home page once everything is done
         return redirect("/")
-
 
 
     else:
         # render page for when user clicks buy
-        return render_template("buy.html")
+        return render_template("sell.html", stock_listing=stock_listing)

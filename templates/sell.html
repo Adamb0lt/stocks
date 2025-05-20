@@ -1,24 +1,26 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Buy
+Sell
 {% endblock %}
 
 {% block main %}
-<form method="post" action="/buy">
+<form method="post" action="/sell">
     <div class="mb-3">
-        <select type="text" autofocus autocomplete="off" class="form-control mx-auto w-auto" name="symbol" Placeholder="Stock">
-        <select>
+        <select class="form-control mx-auto w-auto" name="symbol" Placeholder="Stock">
             <!-- Place in the name of options as part of Jinja loop -->
-            <option>{{ }}</option>
-
+            <option disabled selected value="">Choose a stock</option>
+            {% for stk in stock_listing %}
+            <option value="{{ stock }}">{{ stock }}</option>
+            
+            {% endfor %}
         </select>
     </div>
     <div class="mb-3">
         <input type="text" autofocus autocomplete="off" class="form-control mx-auto w-auto" name="shares" placeholder="Number of shares">
     </div>
 
-    <button type="submit" class="btn btn-primary">Buy!</button>
+    <button type="submit" class="btn btn-primary">Sell!</button>
 </form>
 
 {% endblock %}
