@@ -10,7 +10,7 @@ Sell
         <select class="form-control mx-auto w-auto" name="symbol" Placeholder="Stock">
             <!-- Place in the name of options as part of Jinja loop -->
             <option disabled selected value="">Choose a stock</option>
-            {% for stk in stock_listing %}
+            {% for stock in stock_listing %}
             <option value="{{ stock }}">{{ stock }}</option>
             
             {% endfor %}

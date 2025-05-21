@@ -36,7 +36,7 @@ def after_request(response):
 @login_required
 def index():
     user_id = session["user_id"]
-
+    
     # Get user cash
     user_info = db.execute("SELECT * FROM users WHERE id = ?", user_id)
     cash = user_info[0]["cash"]
@@ -82,7 +82,7 @@ def index():
             "total": usd(current_value),
             "gain_loss": usd(gain_loss)
         })
-    
+
     return render_template("index.html", portfolio=portfolio, cash=usd(cash))
 
 
@@ -118,6 +118,7 @@ def buy():
 
         # store info on user that can be used later on to access variables to place in another table
         user_info = db.execute("SELECT * FROM users WHERE id = ?", user_id)
+        company = stock["name"]
         stock_price = float(stock["price"])
         total_price = shares * float(stock["price"])
 
@@ -127,6 +128,7 @@ def buy():
         # Create the table if it doesn't exist, if it does, add user date in
         # probably will need rules or store info in variables and then add in table
 
+
         # Try for a transaction that is found in other forms of SQL
         try:
 
@@ -135,9 +137,9 @@ def buy():
 
             # add users within table( I could technically have them added every time a new account is successfully created)
             db.execute("""
-                INSERT INTO transactions (user_id, symbol, shares, stock_price, total_price, type, cash_balance)
-                VALUES (?, ?, ?, ?, ?, 'buy', ?)
-            """, user_id, symbol, shares, stock_price, total_price, user_info[0]["cash"] - total_price)
+                INSERT INTO transactions (user_id, company, symbol, shares, stock_price, total_price, type, cash_balance)
+                VALUES (?, ?, ?, ?, ?, ?, 'buy', ?)
+            """, user_id, company, symbol, shares, stock_price, total_price, user_info[0]["cash"] - total_price)
 
             # Update user total cash balance from user's after they buy or sell stock
             db.execute("""
@@ -145,6 +147,18 @@ def buy():
                 SET cash = cash - ?
                 WHERE id = ?
             """, total_price, user_id)
+
+            # check if the stock is already in ownsership table
+            stock_check = db.execute("SELECT stock FROM ownership WHERE user_id = ?", user_id)
+
+            # if stock is in ownership, then update the shares value
+            if stock_check:
+                print(stock_check[0]["stock"])
+                db.execute("UPDATE ownership SET shares = shares + ? WHERE stock = ?", shares, symbol)
+            else:
+                db.execute("""
+                INSERT INTO ownership(user_id, company, stock, shares)
+                VALUES (?, ?, ?, ?)""", user_id, company, symbol, shares)
 
             db.execute("COMMIT")
 
@@ -185,7 +199,7 @@ def history():
     # TODO: Update cash balance
     # Go through each unique stock the user has
     for row in transactions:
-            
+
         symbol = row["symbol"]
         shares = row["shares"]
         stock_info = lookup(symbol)
@@ -353,14 +367,14 @@ def sell():
     # authenticate that symbol is legit
 
     # remake stock_list into a neater list given its a list with dictionaries in it
-    stock_listing = [row["stock"] for row in stock_list] 
-    print(stock_listing)
+    stock_listing = [row["stock"] for row in stock_list]
+    print(stock_list)
 
     if request.method == "POST":
         # get the symbol that the user submits
         symbol = request.form.get("symbol")
         shares = request.form.get("shares")
-        
+
 
 
         # also check that stock exists
@@ -369,10 +383,10 @@ def sell():
         # multiple tests to validate stock based on variables created
         if not stock or not symbol or symbol not in stock_listing:
             return apology("Invalid stock or missing stock symbol", 400)
-        
-        
 
-        
+
+
+
         # find all stocks user owns through ownership table
         # TODO: I also need to add functionality to update shares of stocks from buys and sells
         # TODO: Also need functionality to delete a stock if it is the last share that is sold
@@ -380,26 +394,26 @@ def sell():
                              WHERE user_id = ?
                              and stock = ?
                              """, session["user_id"], symbol)
-        
-        
-            
+
+
+
 
 
         # TODO: check over if this still gives a list that is probs empty
         if not current:
             return apology("You do not own this stock", 400)
-        
+
         # if a user tries to sell more stocks than they own
         try:
             shares = int(shares)
             if shares > current[0]["shares"]:
                 return apology("You cannot sell more shares than you own", 400)
             if shares < 0:
-                return apology("Shares must be a positive integer")            
+                return apology("Shares must be a positive integer")
         except (ValueError, TypeError):
             return apology("Shares must be a positive integer", 400)
-        
-        
+
+
 
         return redirect("/")
 
