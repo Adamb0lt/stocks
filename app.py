@@ -362,13 +362,14 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock"""
+    # user id
+    user_id = session["user_id"]
     # has to be defined outside so it can be accessed by if == post and also by get method
     stock_list = db.execute("SELECT stock FROM ownership WHERE user_id = ?", session["user_id"])
     # authenticate that symbol is legit
 
     # remake stock_list into a neater list given its a list with dictionaries in it
     stock_listing = [row["stock"] for row in stock_list]
-    print(stock_list)
 
     if request.method == "POST":
         # get the symbol that the user submits
@@ -393,7 +394,7 @@ def sell():
         current = db.execute("""SELECT * FROM ownership
                              WHERE user_id = ?
                              and stock = ?
-                             """, session["user_id"], symbol)
+                             """, user_id, symbol)
 
 
 
@@ -402,16 +403,46 @@ def sell():
         # TODO: check over if this still gives a list that is probs empty
         if not current:
             return apology("You do not own this stock", 400)
+        print(current)
 
-        # if a user tries to sell more stocks than they own
+        
         try:
             shares = int(shares)
-            if shares > current[0]["shares"]:
-                return apology("You cannot sell more shares than you own", 400)
-            if shares < 0:
-                return apology("Shares must be a positive integer")
         except (ValueError, TypeError):
             return apology("Shares must be a positive integer", 400)
+        
+        owned_shares = current[0]["shares"]
+        # if a user tries to sell more stocks than they own
+        if shares > owned_shares: # dives into current to access how many shares
+            return apology("You cannot sell more shares than you own", 400)
+        # if a user tries to sell less than 0 shares(impossible)
+        elif shares < 0:
+            return apology("Shares must be a positive integer", 400)
+        # if a user sells shares less than what they currently have(basically need a transaction by SQL terms to update ownership and transaction table)
+        elif shares < owned_shares:
+            # see if I can turn this around to operate like a SQL transaction or trigger
+            db.execute("UPDATE ownership SET shares = shares - ? WHERE stock = ? AND user_id = ?", shares, symbol, user_id)
+        # if user sells all there shares, then the record of the stock in ownership must be deleted
+        elif shares == owned_shares:
+            db.execute("DELETE FROM ownership WHERE stock = ? AND user_id = ?", symbol, user_id)
+        
+
+        # create variable for cash and other details on user to update user balance and also transaction table
+
+        total_value = db.execute("SELECT cash FROM users WHERE id = ?", user_id)
+        company = stock["name"]
+        stock_price = stock["price"]
+        total_value = shares * stock_price
+
+        # Add cash to user's balance
+        db.execute("UPDATE users SET cash = cash + ? WHERE id = ?", total_value, user_id)
+
+        # Record the transaction
+        db.execute("""
+            INSERT INTO transactions (user_id, company, symbol, shares, stock_price, total_price, type, cash_balance)
+            VALUES (?, ?, ?, ?, ?, ?, 'sell', 
+                (SELECT cash FROM users WHERE id = ?)) 
+        """, user_id, company, symbol, -shares, stock_price, total_value, user_id) # uses a query to find the price I need, alternate method of accessing price
 
 
 
