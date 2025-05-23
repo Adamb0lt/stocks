@@ -23,20 +23,25 @@ A full-stack stock trading web application built as part of [CS50x](https://cs50
 - Bootstrap (for styling)
 
 ## 📁 Project Structure
-- app.py # Main Flask application containing routes and app logic
-- helpers.py # Utility functions: apology messages, login decorators, API lookup, USD formatting
-- templates/ # Jinja2 HTML templates (e.g., layout.html, quote.html, register.html)
-- static/ # Static assets like custom CSS or JavaScript files (optional)
-- finance.db # SQLite database file storing user info, transactions, and user portfolio data
-- README.md # This file (project overview, instructions, structure, & next steps)
+
+- `app.py` – Main Flask application containing routes and app logic  
+- `helpers.py` – Utility functions: apology messages, login decorators, API lookup, USD formatting  
+- `templates/` – Jinja2 HTML templates (e.g., layout.html, quote.html, register.html)  
+- `static/` – Static assets like custom CSS or JavaScript files (optional)  
+- `finance.db` – SQLite database file storing user info, transactions, and user portfolio data  
+- `README.md` – This file (project overview, instructions, structure, & next steps)
+
 ## 📍 Current Status
 
-I am actively building out the core functionality of the app. The `quote` and `buy` routes are fully functional, including user balance checks and transaction logging. Table creation and database updates are handled cleanly. Frontend elements are being iteratively styled and improved.
+Most core functionality is now working, including registration, login, quoting, buying, and selling of stocks.  
+- The `sell` and `index` routes are implemented and functional.  
+- However, the **logic still needs slight adjustments** to ensure stock share totals and portfolio values are fully accurate after a sell — particularly in the `index` view.  
+- The `history` route has not yet been completed.
 
 ## 🧭 Next Steps
 
-- [ ] Complete `sell` route with share quantity validation and cash adjustment  
-- [ ] Build out `history` page to show past transactions with timestamps  
+- [ ] Finalize adjustments to `sell` and `index` logic to accurately reflect current portfolio state after sales  
+- [ ] Complete the `history` page to show all user transactions with timestamps  
 - [ ] Enhance UI with better JavaScript interactivity and input validation  
 - [ ] Improve error messaging and form feedback  
 - [ ] Finalize README and clean up code for public release
@@ -54,4 +59,3 @@ I am actively building out the core functionality of the app. The `quote` and `b
 ---
 
 _This project is part of the Harvard CS50x curriculum. It demonstrates practical application of web development, API integration, and database management with Flask._
-
