@@ -1,4 +1,4 @@
-# CS50 Finance App
+# Stock Trading App
 
 A full-stack stock trading web application built as part of [CS50x](https://cs50.harvard.edu/x/)'s Week 9 "Finance" project. The app allows users to register, log in, look up real-time stock prices, buy and sell stocks, and view their portfolio and transaction history.
 
