@@ -206,7 +206,7 @@ def history():
         shares = row["shares"]
         stock_info = lookup(symbol)
         name = stock_info["name"]
-        purchase_price = float(row["price"])
+        purchase_price = row["stock_price"]
         current_price = stock_info["price"]
         total_value = purchase_price * shares
         running_total += total_value
@@ -215,17 +215,15 @@ def history():
             "name": name,
             "symbol": symbol,
             "shares": shares,
-            "purchase price": usd(purchase_price),
+            "purchase_price": usd(purchase_price),
             "current_price": usd(current_price),
             "total_value": usd(total_value),
             "running_total": usd(running_total)
         })
+        print(portfolio)
 
-    return render_template("index.html", portfolio=portfolio, cash=usd(cash))
-    '''
-    """Show history of transactions"""
-    return apology("TODO")
-    '''
+    return render_template("history.html", portfolio=portfolio, cash=usd(cash))
+
 
 
 @app.route("/login", methods=["GET", "POST"])
