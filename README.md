@@ -34,9 +34,9 @@ A full-stack stock trading web application built as part of [CS50x](https://cs50
 ## 📍 Current Status
 
 All core routes are fully implemented and functional:  
-- `register`, `login`, `logout`, `quote`, `buy`, `sell`, and the `index` page all work as expected  
-- Share quantities and portfolio values update correctly after selling  
-- Only the `history` route remains to be completed
+- `register`, `login`, `logout`, `quote`, `buy`, `sell`, `index`, and `history` are working as expected  
+- Stock quantities and portfolio values update correctly when transactions occur  
+- User activity is properly tracked and stored across all features
 
 ## ▶️ How to Run the App
 
@@ -55,10 +55,10 @@ All core routes are fully implemented and functional:
 
 ## 🧭 Next Steps
 
-- [ ] Build out the `history` page to show all user transactions with timestamps  
 - [ ] Enhance UI with JavaScript interactivity and input validation  
 - [ ] Improve error messaging and form feedback  
 - [ ] Final polish and code cleanup for public release  
+- [ ] Optional: Add automated tests or data visualization features
 
 ### ⚙️ Prerequisites
 
